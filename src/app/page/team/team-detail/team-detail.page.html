@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar color="secondary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/team"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{user?.name}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-label>
+      Id: {{user.id}}
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+      Username: {{user.userName}}
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+      Employee ID : {{user.employeeId}}
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+      Email : {{user.email}}
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+      Designations : {{designations}}
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+       Address : {{user.address}}
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+       Blood Group : {{user.bloodgroup}}
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+       Mobile Number : {{user.mobileNumber}}
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>
+       Alternate Mobile Number : {{user.alternateMobileNumber}}
+    </ion-label>
+  </ion-item>
+
+   
+  <ion-button expand="full" (click)="presentDisableAlertConfirm()" *ngIf="checkAuthority('USER_MGMT_ALL_API')">Disable</ion-button>
+  <ion-button expand="full" (click)="statusCheck()">Invt. Asgmt. Status</ion-button>
+  <!--<ion-button expand="full" (click)="status()">Status</ion-button>
+  <ion-button expand="full" (click)="history()">History</ion-button>
+  <ion-button expand="full" (click)="edit()" *ngIf="checkAuthority('ITEM_ALL_OPERATION')">Edit</ion-button>
+  <ion-button expand="full" (click)="delete()" *ngIf="checkAuthority('ITEM_ALL_OPERATION')">Delete</ion-button> -->
+</ion-content>

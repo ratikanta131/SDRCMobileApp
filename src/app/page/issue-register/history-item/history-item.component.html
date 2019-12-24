@@ -1,0 +1,26 @@
+<ion-header>
+    <ion-toolbar color="secondary">
+      <ion-title>History</ion-title>
+      <ion-buttons slot="end">
+          <ion-button (click)="close()">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    
+    <ion-card *ngFor="let item of history;let i= index">
+      <ion-card-header>
+        <ion-card-title>Issue Date: {{item.issueDate}}</ion-card-title>
+      </ion-card-header>
+    
+      <ion-card-content>
+        <ion-label>Issued To :  {{item.assignedTo}}</ion-label><br/>
+        <ion-label>Issued By :  {{item.issuedBy}}</ion-label><br/>
+        <ion-label>Return Date :  {{item.returnDate?item.returnDate:''}}</ion-label><br/>
+        <ion-label>Received By :  {{item.receivedBy?item.receivedBy:''}}</ion-label>
+      </ion-card-content>
+    </ion-card>
+</ion-content>

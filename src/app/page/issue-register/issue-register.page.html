@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar color="secondary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      List of Items
+    </ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+      <ion-searchbar animated showcancelbutton="" (ionChange)="filterItem($event)"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+    <ion-fab horizontal="end" vertical="bottom" slot="fixed" *ngIf="checkAuthority('ITEM_ALL_OPERATION')">
+        <ion-fab-button color="primary">
+          <ion-icon name="add" (click)="showCreateItemModal(items, isEdit)"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+
+      
+        <ion-item *ngFor="let item of items | filter: textToSearch;let i= index" (click)="itemSelected(item)" class="item">
+          <ion-icon name="list-box" slot="start"></ion-icon>
+          <ion-label>{{ item.name }}</ion-label>
+        </ion-item>
+</ion-content>

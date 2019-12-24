@@ -1,0 +1,8 @@
+{
+  "name": "sdrc",
+  "integrations": {
+    "cordova": {},
+    "capacitor": {}
+  },
+  "type": "angular"
+}

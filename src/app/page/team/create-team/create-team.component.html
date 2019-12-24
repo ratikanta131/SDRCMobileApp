@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>createTeam</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <form [formGroup]="checkoutForm" #f="ngForm" (ngSubmit)="onSubmit(checkoutForm.value)">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-md="6" offset-md="3">
+          <ion-list>
+            <ion-item>
+              <ion-label position="floating">Name</ion-label>
+              <ion-input type="text" [(ngModel)]="fields.name" formControlName="name" required></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Employee Id</ion-label>
+              <ion-input type="number" [attr.maxlength]="4" [(ngModel)]="fields.employeeId" formControlName="employeeId"
+                required></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Email</ion-label>
+              <ion-input type="email" [(ngModel)]="fields.email" formControlName="email"></ion-input>
+            </ion-item>
+            <ion-item >
+              <ion-label>Designations Id</ion-label>
+              <ion-select  multiple="true" [(ngModel)]="fields.designationIds" formControlName="designationIds"
+                cancelText="Nah" okText="Okay!">
+                <ion-select-option *ngFor="let designstion of allDesignstions; let i = index" [value]="designstion.id">{{ designstion.name }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Username</ion-label>
+              <ion-input type="text" [(ngModel)]="fields.userName" formControlName="userName"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Password</ion-label>
+              <ion-input type="password" [(ngModel)]="fields.password" formControlName="password"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Address</ion-label>
+              <ion-input type="text" [(ngModel)]="fields.address" formControlName="address"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Blood Group</ion-label>
+              <ion-input type="text" [(ngModel)]="fields.bloodgroup" formControlName="bloodgroup"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Mobile Number</ion-label>
+              <ion-input type="text" [(ngModel)]="fields.mobileNumber" formControlName="mobileNumber"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Alternate Mobile Number</ion-label>
+              <ion-input type="text" [(ngModel)]="fields.alternateMobileNumber" formControlName="alternateMobileNumber">
+              </ion-input>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-sd="6" offset-sd="3">
+          <ion-button type="submit" color="primary" [disabled]="!f.valid" expand="block">
+            Add Team
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
+</ion-content>

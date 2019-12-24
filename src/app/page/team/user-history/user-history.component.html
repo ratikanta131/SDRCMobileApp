@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title *ngFor="let item of users">{{ item.name }}</ion-title>
+    <ion-buttons slot="end">
+        <ion-button (click)="close()">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-content *ngFor="let item of modalData;let i= index">
+        <ion-item>
+          &#8226; {{ item.itemName }} was assigned by {{ item.issuedBy }} on {{ item.issueDate }}.
+        </ion-item>
+     </ion-card-content>
+  </ion-card>
+</ion-content>

@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar color="secondary">
+    <ion-buttons slot="start">
+      <ion-menu-button color="primary"></ion-menu-button>
+    </ion-buttons>
+    <ion-title color="primary">
+      Home
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content no-padding>
+  <ion-grid>
+    <ion-row size-lg="12" >
+      <ion-col size="6" size-lg="2" offset-lg="1" text-center>
+        <ion-button color="primary" style="height: 100px;" [routerLink]="['/issue-register']">Issue Register</ion-button>
+      </ion-col>
+      <ion-col size="6" size-lg="2" offset-lg="1" text-center>
+        <ion-button color="primary" style="height: 100px;" [routerLink]="['/team']">Team</ion-button>
+      </ion-col>
+    </ion-row>
+    
+  </ion-grid>
+</ion-content>
