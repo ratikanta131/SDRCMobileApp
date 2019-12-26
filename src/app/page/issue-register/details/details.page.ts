@@ -6,12 +6,12 @@ import { UtilService } from 'src/app/service/util.service';
 import { catchError } from 'rxjs/operators';
 import { StatusCheckComponent } from '../status-check/status-check.component';
 import { HistoryItemComponent } from '../history-item/history-item.component';
-import { IHistory } from 'src/app/interface/history';
 import { AssignItemComponent } from '../assign-item/assign-item.component';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { SyncService } from 'src/app/service/sync.service';
 import { AuthService } from '../../login/auth.service';
+import { IAssignModel } from 'src/app/interface/assignModel';
 
 @Component({
   selector: 'app-details',
@@ -84,22 +84,22 @@ export class DetailsPage implements OnInit {
     await modal.present();
   }
 
-  async showStatusCheckModal(data) {
+  async showStatusCheckModal(assignModel: IAssignModel) {
     const modal = await this.modalController.create({
       component: StatusCheckComponent,
       componentProps: {
-        data,
+        assignModel,
       }
     });
 
     await modal.present();
   }
 
-  async showHistoryModal(history: IHistory[]) {
+  async showHistoryModal(assignModels: IAssignModel[]) {
     const modal = await this.modalController.create({
       component: HistoryItemComponent,
       componentProps: {
-        history,
+        assignModels,
       }
     });
 

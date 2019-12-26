@@ -45,81 +45,19 @@ export class TeamPage implements OnInit {
   }
 
 
-  async showCreateTeamModal(users, isEdit) {
+  async showCreateTeamModal() {
     const modal = await this.modalController.create({
       component: CreateTeamComponent,
       componentProps: {
-        users,
-        isEdit
+        user: null,
+        isEdit: false
       }
     });
 
     await modal.present();
-  }
-  async presentDeleteAlertConfirm(index: number) {
-    const alert = await this.alertController.create({
-      header: 'Confirm!',
-      message: 'This will remove the user from team list. Are sure to delete the user?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: (blah) => {
-            console.log('Confirm Cancel: blah');
-          }
-        }, {
-          text: 'yes',
-          handler: () => {
-            console.log('Confirm Okay');
-            const id = this.users[index].id;
-
-            this.service.deleteUser(id)
-    .pipe(
-      catchError(this.utilService.handleError)
-    ).subscribe(data => {
-    this.utilService.openToast('Delete Successful');
-    this.router.navigateByUrl('/home');
-    this.syncService.syncData();
-    });
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  editTeamData(users: []) {
-    this.isEdit =  true;
-    this.showCreateTeamModal(users, this.isEdit);
-    console.log(users);
   }
 
   
-
-  historyCheck(index: number) {
-    const id = this.users[index].id;
-    this.service.historyUser(id)
-      .pipe(
-        catchError(this.utilService.handleError)
-      ).subscribe(data => {
-        this.showHistoryModal(index, id, data);
-      });
-  }
-
-
-  async showHistoryModal(index: number, id: number, data) {
-    const modal = await this.modalController.create({
-      component: UserHistoryComponent,
-      componentProps: {
-        id,
-        data,
-      }
-    });
-
-    await modal.present();
-  }
 
   userSelected(user: TeamAdd) {
     this.service.selectedUser = user as ITeam;

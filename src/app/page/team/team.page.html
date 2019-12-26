@@ -13,33 +13,11 @@
 <ion-content>
   <ion-fab horizontal="end" vertical="bottom" slot="fixed" *ngIf="checkAuthority('USER_MGMT_ALL_API')">
     <ion-fab-button color="primary">
-      <ion-icon name="add" (click)="showCreateTeamModal(users, isEdit)"></ion-icon>
+      <ion-icon name="add" (click)="showCreateTeamModal()"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-    <ion-item *ngFor="let user of users | filter: textToSearch; let i= index" (click)="userSelected(user)">
+    <ion-item *ngFor="let user of users | filter: textToSearch; let i= index" (click)="userSelected(user)" class="sdrc-cursor-pointer">
       <ion-icon name="person" slot="start"></ion-icon>
       <ion-label>{{ user.name }}</ion-label>
     </ion-item>
-  
-    <!-- <ion-card-content>
-      <ion-button (click)="toggleCollapse(i)">more</ion-button>
-      <div *ngIf="item.isCollapsed">
-        <ion-grid>
-            <ion-row size="12">
-              
-                <ion-col size="3" size-lg="2" offset-lg="1" text-center>
-                  <ion-button color="primary" (click)="statusCheck(i)">Status</ion-button>
-                </ion-col>
-                <ion-col size="3" size-lg="2" offset-lg="1" text-center>
-                  <ion-button color="warning" (click)='editTeamData(item)'>Edit</ion-button>
-                </ion-col>
-                <ion-col size="3" size-lg="2" offset-lg="1" text-center>
-                  <ion-button color="success" (click)="historyCheck(i)">History</ion-button>
-                </ion-col>
-                
-                
-              </ion-row>
-      </ion-grid>
-      </div>
-    </ion-card-content> -->
 </ion-content>

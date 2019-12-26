@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { Platform } from '@ionic/angular';
+import { Platform, LoadingController } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AuthService } from './page/login/auth.service';
@@ -15,6 +15,7 @@ import { IUserInfo } from './interface/userInfo';
 })
 export class AppComponent {
   user: IUserInfo;
+  loading: any;
   public appPages = [
     {
       title: 'Home',
@@ -37,6 +38,7 @@ export class AppComponent {
     private authService: AuthService,
     private router: Router,
     private syncService: SyncService,
+    public loadingController: LoadingController
   ) {
     this.initializeApp();
     this.authService.user.subscribe(user => {
@@ -55,8 +57,19 @@ export class AppComponent {
     this.authService.logout();
     this.router.navigateByUrl('/login');
   }
-  onSync() {
-    this.syncService.syncData();
+  async onSync() {
+    this.presentLoading();
+    await this.syncService.syncData();
+    setTimeout(() => {
+      this.loadingController.dismiss();
+    }, 1000);
+  }
+
+  async presentLoading() {
+    this.loading = await this.loadingController.create({
+      message: 'Syncing, please wait...'
+    });
+    await this.loading.present();
   }
 
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
-import { TeamAdd } from 'src/app/interface/teamAdd';
+import { TeamAdd, ITeam } from 'src/app/interface/teamAdd';
 import { NgForm } from '@angular/forms';
 import { TeamService } from './team.service';
 import { FormBuilder } from '@angular/forms';
@@ -16,8 +16,11 @@ import { UtilService } from 'src/app/service/util.service';
   styleUrls: ['./create-team.component.scss'],
 })
 export class CreateTeamComponent implements OnInit {
-  @Input() users: [];
-  @Input() isEdit: Boolean;
+
+  title = '';
+  submitButtonText = '';
+  @Input() user: ITeam;
+  @Input() isEdit: boolean;
   forEdit = this.isEdit;
   allDesignstions: any;
   checkoutForm;
@@ -58,31 +61,37 @@ export class CreateTeamComponent implements OnInit {
                }
 
   ngOnInit() {
+    if (this.isEdit) {
+      this.title = 'Edit Team';
+      this.submitButtonText = 'Edit';
+      this.fields.id = this.user.id;
+      this.fields.userName = this.user.userName;
+      this.fields.password = this.user.password;
+      this.fields.designationIds = this.user.designationIds;
+      this.fields.email = this.user.email;
+      this.fields.name = this.user.name;
+      this.fields.employeeId = this.user.employeeId;
+      this.fields.address = this.user.address;
+      this.fields.bloodgroup = this.user.bloodgroup;
+      this.fields.mobileNumber = this.user.mobileNumber;
+      this.fields.alternateMobileNumber = this.user.alternateMobileNumber;
+    } else {
+      this.title = 'Create Team';
+      this.submitButtonText = 'Create';
+    }
     this.teamService.getDesignation()
     .pipe(
       catchError(this.utilService.handleError)
     ).subscribe(data => {
-      console.log(data);
       this.allDesignstions = data;
     });
-    this.fields.id = this.users['id'];
-    this.fields.userName = this.users['userName'];
-    this.fields.password = this.users['password'];
-    this.fields.designationIds = this.users['designationIds'];
-    this.fields.email = this.users['email'];
-    this.fields.name = this.users['name'];
-    this.fields.employeeId = this.users['employeeId'];
-    this.fields.address = this.users['address'];
-    this.fields.bloodgroup = this.users['bloodgroup'];
-    this.fields.mobileNumber = this.users['mobileNumber'];
-    this.fields.alternateMobileNumber = this.users['alternateMobileNumber'];
   }
   async close() {
     await this.modalController.dismiss();
   }
-  async openToast() {
+  async openToast(message: string) {
     const toast = await this.toastCtrl.create({
-      message: 'Item added successfully.',
+      message,
       duration: 2000
     });
     toast.present();
@@ -107,8 +116,7 @@ export class CreateTeamComponent implements OnInit {
       .pipe(
         catchError(this.utilService.handleError)
       ).subscribe(data => {
-        this.openToast();
-        console.log(data);
+        this.openToast('User updated successfully');
         this.modalController.dismiss();
         this.router.navigateByUrl('/home');
         this.syncService.syncData();
@@ -118,7 +126,7 @@ export class CreateTeamComponent implements OnInit {
     .pipe(
       catchError(this.utilService.handleError)
     ).subscribe(data => {
-      this.openToast();
+      this.openToast('User added successfully');
       console.log(data);
       this.router.navigateByUrl('/home');
       this.modalController.dismiss();

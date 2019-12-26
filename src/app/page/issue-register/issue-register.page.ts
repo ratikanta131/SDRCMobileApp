@@ -48,7 +48,6 @@ export class IssueRegisterPage implements OnInit {
 
   toggleCollapse(itemId: number) {
     const index: number = this.items.findIndex(d => d.id === itemId);
-    console.log(index);
     this.items[index].isCollapsed = !this.items[index].isCollapsed;
   }
 
@@ -56,12 +55,12 @@ export class IssueRegisterPage implements OnInit {
     this.items = await this.storage.get(Constants.DATABASE_KEYS.item);
   }
 
-  async showCreateItemModal(item: Item, forEdit: boolean) {
+  async showCreateItemModal() {
     const modal = await this.modalController.create({
       component: CreateItemComponent,
       componentProps: {
-        item,
-        forEdit
+        item: null,
+        forEdit: false
       }
     });
 

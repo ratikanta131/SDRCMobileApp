@@ -33,7 +33,7 @@ export class CreateItemComponent implements OnInit {
 
   title: string;
 
-  @Input() item: [];
+  @Input() item: Item;
   @Input() forEdit: boolean;
   form: FormGroup;
   fields: ItemAdd = {
@@ -55,11 +55,15 @@ constructor(private modalController: ModalController,
   }
 
 ngOnInit() {
-    this.title = this.forEdit ? 'Edit Item' : 'Create Item';
-    this.fields.id = this.item['id'];
-    this.fields.name = this.item['name'];
-    this.fields.itemId = this.item['itemId'];
-    this.fields.accessories = this.item['accessories'];
+  if (this.forEdit) {
+    this.title = 'Edit Item';
+    this.fields.id = this.item.id;
+    this.fields.name = this.item.name;
+    this.fields.itemId = this.item.itemId;
+    this.fields.accessories = this.item.accessories;
+  } else {
+    this.title = 'Edit Item';
+  }
 
 
   }

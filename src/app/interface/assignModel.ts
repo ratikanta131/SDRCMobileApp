@@ -1,4 +1,4 @@
-export interface IHistory {
+export interface IAssignModel {
     assignedItemId: number;
     itemId: string;
     itemName: string;

@@ -8,6 +8,9 @@ import { UtilService } from 'src/app/service/util.service';
 import { Router } from '@angular/router';
 import { SyncService } from 'src/app/service/sync.service';
 import { UserStatusComponent } from '../user-status/user-status.component';
+import { IAssignModel } from 'src/app/interface/assignModel';
+import { CreateTeamComponent } from '../create-team/create-team.component';
+import { UserHistoryComponent } from '../user-history/user-history.component';
 
 @Component({
   selector: 'app-team-detail',
@@ -73,11 +76,51 @@ export class TeamDetailPage implements OnInit {
     });
   }
 
-  async showStatusCheckModal(data) {
+  async showStatusCheckModal(assignModels: IAssignModel[]) {
     const modal = await this.modalController.create({
       component: UserStatusComponent,
       componentProps: {
-        data,
+        assignModels,
+      }
+    });
+
+    await modal.present();
+  }
+
+  editTeamData() {
+    this.showCreateTeamModal();
+  }
+
+  async showCreateTeamModal() {
+    const modal = await this.modalController.create({
+      component: CreateTeamComponent,
+      componentProps: {
+        user: this.user,
+        isEdit: true
+      }
+    });
+
+    await modal.present();
+  }
+
+  history() {
+    this.service.historyUser(this.user.id)
+      .pipe(
+        catchError(this.utilService.handleError)
+      ).subscribe(data => {
+        const returnedModels: IAssignModel[] = data.filter(d => d.returnDate != null);
+        const notReturnedModels: IAssignModel[] = data.filter(d => d.returnDate == null);
+        const finalModels = notReturnedModels.concat(returnedModels);
+        this.showHistoryModal(finalModels);
+      });
+  }
+
+
+  async showHistoryModal(assignModels: IAssignModel[]) {
+    const modal = await this.modalController.create({
+      component: UserHistoryComponent,
+      componentProps: {
+        assignModels,
       }
     });
 

@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar color="secondary">
-    <ion-title>Inventory Assignment Status</ion-title>
+    <ion-title>Status</ion-title>
     <ion-buttons slot="end">
         <ion-button (click)="close()">
           <ion-icon slot="icon-only" name="close"></ion-icon>
@@ -10,18 +10,14 @@
 </ion-header>
 
 <ion-content>
-    <!-- <ion-card *ngFor="let status of modalData; let i=index">
-      <ion-card-content>
-        This <b>{{ modalData[i].itemName }}</b>(<b>{{ modalData[i].itemId }}</b>) was assigned by <b>{{ modalData[i].issuedBy }}</b> on <b>{{ modalData[i].issueDate }}</b>.
-       </ion-card-content>
-    </ion-card> -->
-    <ion-card>
+    <ion-card *ngFor="let assignment of assignModels">
       <ion-card-header>
-        <ion-card-title>Issue Date: {{modalData.issueDate}}</ion-card-title>
+        <ion-card-title>{{assignment.itemName}}</ion-card-title>
       </ion-card-header>
     
       <ion-card-content>
-        <ion-label>Issued By :  {{modalData.issuedBy}}</ion-label><br/>
+        <ion-label>Issued By :  {{assignment.issuedBy}}</ion-label><br/>
+        <ion-label>Issue Date: {{assignment.issueDate}}</ion-label><br/>
       </ion-card-content>
     </ion-card>
 

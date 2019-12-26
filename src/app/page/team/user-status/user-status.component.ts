@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
+import { IAssignModel } from 'src/app/interface/assignModel';
 
 @Component({
   selector: 'app-user-status',
@@ -8,14 +9,10 @@ import { ModalController } from '@ionic/angular';
 })
 export class UserStatusComponent implements OnInit {
 
-  @Input() data: any;
-  modalData:any;
-  
+  @Input() assignModels: IAssignModel[];
   constructor(private modalController: ModalController) { }
 
   ngOnInit() {
-    this.modalData = this.data;
-    console.log(this.data);
   }
   async close() {
     await this.modalController.dismiss();

@@ -1,6 +1,6 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title *ngFor="let item of users">{{ item.name }}</ion-title>
+  <ion-toolbar color="secondary">
+    <ion-title>History</ion-title>
     <ion-buttons slot="end">
         <ion-button (click)="close()">
           <ion-icon slot="icon-only" name="close"></ion-icon>
@@ -10,11 +10,16 @@
 </ion-header>
 
 <ion-content>
-  <ion-card>
-    <ion-card-content *ngFor="let item of modalData;let i= index">
-        <ion-item>
-          &#8226; {{ item.itemName }} was assigned by {{ item.issuedBy }} on {{ item.issueDate }}.
-        </ion-item>
-     </ion-card-content>
+  <ion-card *ngFor="let assignModel of assignModels">
+    <ion-card-header>
+      <ion-card-title>{{assignModel.itemName}}</ion-card-title>
+    </ion-card-header>
+  
+    <ion-card-content>
+      <ion-label>Issued By :  {{assignModel.issuedBy}}</ion-label><br/>
+      <ion-label>Issue Date :  {{assignModel.issueDate}}</ion-label><br/>
+      <ion-label>Return Date :  {{assignModel.returnDate?assignModel.returnDate:''}}</ion-label><br/>
+      <ion-label>Received By :  {{assignModel.receivedBy?assignModel.receivedBy:''}}</ion-label>
+    </ion-card-content>
   </ion-card>
 </ion-content>

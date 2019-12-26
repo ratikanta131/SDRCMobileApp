@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Constants } from 'src/constants';
-import { IHistory } from 'src/app/interface/history';
+import { IAssignModel } from 'src/app/interface/assignModel';
 
 @Injectable()
 
@@ -18,9 +18,9 @@ export class IssueRegisterService {
         return this.http.delete(Constants.HOME_URL + 'api/item/delete/' + itemId );
     }
     historyItem(itemId: number) {
-        return this.http.get<IHistory[]>(Constants.HOME_URL + 'api/assignment/historyByItem/' + itemId );
+        return this.http.get<IAssignModel[]>(Constants.HOME_URL + 'api/assignment/historyByItem/' + itemId );
     }
     checkStatus(itemId: number) {
-        return this.http.get(Constants.HOME_URL + 'api/assignment/getByItem/' + itemId);
+        return this.http.get<IAssignModel>(Constants.HOME_URL + 'api/assignment/getByItem/' + itemId);
     }
 }

@@ -56,9 +56,7 @@
 
    
   <ion-button expand="full" (click)="presentDisableAlertConfirm()" *ngIf="checkAuthority('USER_MGMT_ALL_API')">Disable</ion-button>
-  <ion-button expand="full" (click)="statusCheck()">Invt. Asgmt. Status</ion-button>
-  <!--<ion-button expand="full" (click)="status()">Status</ion-button>
+  <ion-button expand="full" (click)="statusCheck()">Status</ion-button>
+  <ion-button expand="full" (click)="editTeamData()" *ngIf="checkAuthority('USER_MGMT_ALL_API')">Edit</ion-button>
   <ion-button expand="full" (click)="history()">History</ion-button>
-  <ion-button expand="full" (click)="edit()" *ngIf="checkAuthority('ITEM_ALL_OPERATION')">Edit</ion-button>
-  <ion-button expand="full" (click)="delete()" *ngIf="checkAuthority('ITEM_ALL_OPERATION')">Delete</ion-button> -->
 </ion-content>
