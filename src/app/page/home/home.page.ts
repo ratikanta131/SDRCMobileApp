@@ -45,7 +45,6 @@ export class HomePage implements OnInit, OnDestroy {
       async responseList => {
         await this.syncService.saveItem(responseList[0]);
         await this.syncService.saveUsers(responseList[1]);
-        console.log('sync success');
         this.loadingService.dismissLoader();
       }
       );
