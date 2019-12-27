@@ -6,7 +6,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { LoadingService } from 'src/app/loading.service';
-import { ToastController } from '@ionic/angular';
+import { UtilService } from 'src/app/service/util.service';
 var thisObject;
 @Component({
   selector: 'app-home',
@@ -16,9 +16,9 @@ var thisObject;
 export class HomePage implements OnInit, OnDestroy {
   constructor(private router: Router,
               private loadingService: LoadingService,
-              private toastCtrl: ToastController,
               private authService: AuthService,
-              private syncService: SyncService) { }
+              private syncService: SyncService,
+              private utilService: UtilService) { }
 
   ngOnInit() {
     this.authService.setLoggedInUser();
@@ -52,25 +52,27 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   handleError(error: HttpErrorResponse) {
-    thisObject.loadingService.dismissLoader();
+    setTimeout(() => {
+      thisObject.loadingService.dismissLoader();
+    }, 1000);
     if (error.status === 0) {
-        thisObject.openToast(`Please check your internet connection.`);
+        thisObject.utilService.openToast(`Please check your internet connection.`);
     } else {
       if (error.error instanceof ErrorEvent) {
         // A client-side or network error occurred. Handle it accordingly.
-        thisObject.openToast('An error occurred:' + error.error.message);
+        thisObject.utilService.openToast('An error occurred:' + error.error.message);
       } else {
         switch (error.status) {
           case 401:
-            thisObject.openToast(error.error.error_description);
+            thisObject.utilService.openToast(error.error.error_description);
             thisObject.authService.logout();
             thisObject.router.navigateByUrl('/login');
             break;
           case 403:
-            thisObject.openToast(error.error.error_description);
+            thisObject.utilService.openToast(error.error.error_description);
             break;
           default:
-            thisObject.openToast(error.error.message);
+            thisObject.utilService.openToast(error.error.message);
             break;
         }
       }
@@ -78,14 +80,6 @@ export class HomePage implements OnInit, OnDestroy {
       return throwError(
         'Something bad happened; please try again later.');
     }
-  }
-
-  async openToast(message: string) {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2000
-    });
-    toast.present();
   }
 
   ngOnDestroy(): void {

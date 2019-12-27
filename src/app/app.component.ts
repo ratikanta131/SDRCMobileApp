@@ -88,7 +88,9 @@ export class AppComponent {
     toast.present();
   }
   handleError(error: HttpErrorResponse) {
-    thisObject.loadingService.dismissLoader();
+    setTimeout(() => {
+      thisObject.loadingService.dismissLoader();
+    }, 1000);
     if (error.status === 0) {
         thisObject.openToast(`Please check your internet connection.`);
     } else {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserTeamService } from '../user-team.service';
 import { ITeam } from 'src/app/interface/teamAdd';
 import { AuthService } from '../../login/auth.service';
@@ -11,13 +11,16 @@ import { UserStatusComponent } from '../user-status/user-status.component';
 import { IAssignModel } from 'src/app/interface/assignModel';
 import { CreateTeamComponent } from '../create-team/create-team.component';
 import { UserHistoryComponent } from '../user-history/user-history.component';
-
+import { HttpErrorResponse } from '@angular/common/http';
+import { throwError } from 'rxjs';
+import { LoadingService } from 'src/app/loading.service';
+var thisObject;
 @Component({
   selector: 'app-team-detail',
   templateUrl: './team-detail.page.html',
   styleUrls: ['./team-detail.page.scss'],
 })
-export class TeamDetailPage implements OnInit {
+export class TeamDetailPage implements OnInit, OnDestroy {
 
   user: ITeam;
   designations = '';
@@ -26,10 +29,12 @@ export class TeamDetailPage implements OnInit {
               private alertController: AlertController,
               private utilService: UtilService,
               private router: Router,
+              private loadingService: LoadingService,
               private syncService: SyncService,
               private modalController: ModalController) { }
 
   ngOnInit() {
+    thisObject = this;
     this.user = this.service.selectedUser;
     this.user.designationNames.forEach(d => {
       this.designations += (d + ',');
@@ -50,15 +55,12 @@ export class TeamDetailPage implements OnInit {
       }, {
         text: 'yes',
         handler: () => {
-          console.log('Confirm Okay');
-
+          this.loadingService.presentLoader('Disabling user, please wait...');
           this.service.disableUser(this.user.id)
             .pipe(
-              catchError(this.utilService.handleError)
+              catchError(this.handleError)
             ).subscribe(data => {
-              this.utilService.openToast('Disable Successful');
-              this.router.navigateByUrl('/home');
-              this.syncService.syncData();
+              this.updateDataInLocalDatabase('Disable Successful');
             });
         }
       }]
@@ -68,10 +70,12 @@ export class TeamDetailPage implements OnInit {
   }
 
   statusCheck() {
+    this.loadingService.presentLoader('Checking status, please wait...');
     this.service.checkStatus(this.user.id)
     .pipe(
-      catchError(this.utilService.handleError)
+      catchError(this.handleError)
     ).subscribe(data => {
+      this.loadingService.dismissLoader();
       this.showStatusCheckModal(data);
     });
   }
@@ -104,10 +108,12 @@ export class TeamDetailPage implements OnInit {
   }
 
   history() {
+    this.loadingService.presentLoader('Checking status, please wait...');
     this.service.historyUser(this.user.id)
       .pipe(
-        catchError(this.utilService.handleError)
+        catchError(this.handleError)
       ).subscribe(data => {
+        this.loadingService.dismissLoader();
         const returnedModels: IAssignModel[] = data.filter(d => d.returnDate != null);
         const notReturnedModels: IAssignModel[] = data.filter(d => d.returnDate == null);
         const finalModels = notReturnedModels.concat(returnedModels);
@@ -129,6 +135,57 @@ export class TeamDetailPage implements OnInit {
 
   checkAuthority(authority: string) {
     return this.authService.checkAuthority(authority);
+  }
+
+  updateDataInLocalDatabase(message: string) {
+    this.syncService.syncData()
+    .pipe(
+      catchError(this.handleError)
+    )
+    .subscribe(
+      async responseList => {
+        await this.syncService.saveItem(responseList[0]);
+        await this.syncService.saveUsers(responseList[1]);
+        this.loadingService.dismissLoader();
+        this.utilService.openToast(message);
+        this.router.navigateByUrl('/home');
+      }
+    );
+  }
+
+  handleError(error: HttpErrorResponse) {
+    setTimeout(() => {
+      thisObject.loadingService.dismissLoader();
+    }, 1000);
+    if (error.status === 0) {
+        thisObject.utilService.openToast(`Please check your internet connection.`);
+    } else {
+      if (error.error instanceof ErrorEvent) {
+        // A client-side or network error occurred. Handle it accordingly.
+        thisObject.utilService.openToast('An error occurred:' + error.error.message);
+      } else {
+        switch (error.status) {
+          case 401:
+            thisObject.utilService.openToast(error.error.error_description);
+            thisObject.authService.logout();
+            thisObject.router.navigateByUrl('/login');
+            break;
+          case 403:
+            thisObject.utilService.openToast(error.error.error_description);
+            break;
+          default:
+            thisObject.utilService.openToast(error.error.message);
+            break;
+        }
+      }
+      // return an observable with a user-facing error message
+      return throwError(
+        'Something bad happened; please try again later.');
+    }
+  }
+
+  ngOnDestroy(): void {
+    thisObject = null;
   }
 
 }

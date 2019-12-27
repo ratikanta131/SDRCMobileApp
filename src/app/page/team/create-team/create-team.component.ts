@@ -1,21 +1,24 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ModalController, ToastController } from '@ionic/angular';
+import { Component, OnInit, Input, OnDestroy, EventEmitter } from '@angular/core';
+import { ModalController} from '@ionic/angular';
 import { TeamAdd, ITeam } from 'src/app/interface/teamAdd';
-import { NgForm } from '@angular/forms';
 import { TeamService } from './team.service';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SyncService } from 'src/app/service/sync.service';
 import { catchError } from 'rxjs/operators';
 import { UtilService } from 'src/app/service/util.service';
-
+import { LoadingService } from 'src/app/loading.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { throwError, Subscription } from 'rxjs';
+import { AuthService } from '../../login/auth.service';
+var thisObject;
 
 @Component({
   selector: 'app-create-team',
   templateUrl: './create-team.component.html',
   styleUrls: ['./create-team.component.scss'],
 })
-export class CreateTeamComponent implements OnInit {
+export class CreateTeamComponent implements OnInit, OnDestroy {
 
   title = '';
   submitButtonText = '';
@@ -37,14 +40,17 @@ export class CreateTeamComponent implements OnInit {
     mobileNumber: null,
     alternateMobileNumber: null,
   };
+  closeModal: EventEmitter < string > ;
+  closeModalSubscription: Subscription;
 
   constructor(private modalController: ModalController,
               private teamService: TeamService,
-              private toastCtrl: ToastController,
               private router: Router,
               private syncService: SyncService,
+              private loadingService: LoadingService,
               private utilService: UtilService,
-              private formBuilder: FormBuilder) {
+              private formBuilder: FormBuilder,
+              private authService: AuthService) {
                 this.checkoutForm = this.formBuilder.group({
                   id: null,
                   userName: '',
@@ -57,6 +63,11 @@ export class CreateTeamComponent implements OnInit {
                   bloodgroup: '',
                   mobileNumber: null,
                   alternateMobileNumber: null,
+                });
+                this.closeModal = new EventEmitter();
+                this.closeModalSubscription = this.closeModal.subscribe(message => {
+                  this.loadingService.dismissLoader();
+                  this.modalController.dismiss();
                 });
                }
 
@@ -79,25 +90,21 @@ export class CreateTeamComponent implements OnInit {
       this.title = 'Create Team';
       this.submitButtonText = 'Create';
     }
+    this.loadingService.presentLoader('Fetching designation, please wait...');
+    thisObject = this;
     this.teamService.getDesignation()
     .pipe(
-      catchError(this.utilService.handleError)
+      catchError(this.handleError)
     ).subscribe(data => {
       this.allDesignstions = data;
+      this.loadingService.dismissLoader();
     });
   }
   async close() {
     await this.modalController.dismiss();
   }
-  async openToast(message: string) {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2000
-    });
-    toast.present();
-  }
 
-  onSubmit(customerData) {
+  onSubmit() {
     const teamDetails = {
       id: this.fields.id,
       userName: this.fields.userName,
@@ -112,30 +119,78 @@ export class CreateTeamComponent implements OnInit {
       alternateMobileNumber: this.fields.alternateMobileNumber
     };
     if (this.isEdit) {
+      this.loadingService.presentLoader('Updating user, please wait...');
       this.teamService.updateTeam(teamDetails)
       .pipe(
-        catchError(this.utilService.handleError)
-      ).subscribe(data => {
-        this.openToast('User updated successfully');
+        catchError(this.handleError)
+      ).subscribe(() => {
         this.modalController.dismiss();
-        this.router.navigateByUrl('/home');
-        this.syncService.syncData();
+        this.updateDataInLocalDatabase('User updated successfully');
       });
     } else {
-    this.teamService.saveTeam(teamDetails)
-    .pipe(
-      catchError(this.utilService.handleError)
-    ).subscribe(data => {
-      this.openToast('User added successfully');
-      console.log(data);
-      this.router.navigateByUrl('/home');
-      this.modalController.dismiss();
-      this.syncService.syncData();
-    });
-    console.warn('Your order has been submitted', customerData);
+      this.loadingService.presentLoader('Creating user, please wait...');
+      this.teamService.saveTeam(teamDetails)
+      .pipe(
+        catchError(this.handleError)
+      ).subscribe(data => {
+        this.modalController.dismiss();
+        this.updateDataInLocalDatabase('User created successfully');
+      });
   }
 }
 
+handleError(error: HttpErrorResponse) {
+  thisObject.closeModal.emit('');
+  if (error.status === 0) {
+      thisObject.utilService.openToast(`Please check your internet connection.`);
+  } else {
+    if (error.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      thisObject.utilService.openToast('An error occurred:' + error.error.message);
+    } else {
+      switch (error.status) {
+        case 401:
+          thisObject.utilService.openToast(error.error.error_description);
+          thisObject.close();
+          thisObject.authService.logout();
+          thisObject.router.navigateByUrl('/login');
+          thisObject.close();
+          thisObject.closeModal.emit('');
+          break;
+        case 403:
+          thisObject.utilService.openToast(error.error.error_description);
+          break;
+        default:
+          thisObject.utilService.openToast(error.error.message);
+          break;
+      }
+    }
+    // return an observable with a user-facing error message
+    return throwError(
+      'Something bad happened; please try again later.');
+  }
+}
 
+updateDataInLocalDatabase(message: string) {
+  this.syncService.syncData()
+  .pipe(
+    catchError(this.handleError)
+  )
+  .subscribe(
+    async responseList => {
+      await this.syncService.saveItem(responseList[0]);
+      await this.syncService.saveUsers(responseList[1]);
+      this.loadingService.dismissLoader();
+      this.utilService.openToast(message);
+      this.router.navigateByUrl('/home');
+    }
+  );
+}
+
+ngOnDestroy(): void {
+  this.loadingService.dismissLoader();
+  this.closeModalSubscription.unsubscribe();
+  thisObject = null;
+}
 
 }

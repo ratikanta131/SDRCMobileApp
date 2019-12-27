@@ -11,9 +11,9 @@
 </ion-header>
 
 <ion-content>
-  <ion-fab horizontal="end" vertical="bottom" slot="fixed" *ngIf="checkAuthority('USER_MGMT_ALL_API')">
+  <ion-fab horizontal="end" vertical="bottom" slot="fixed" *ngIf="checkAuthority('USER_MGMT_ALL_API')" (click)="showCreateTeamModal()">
     <ion-fab-button color="primary">
-      <ion-icon name="add" (click)="showCreateTeamModal()"></ion-icon>
+      <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
     <ion-item *ngFor="let user of users | filter: textToSearch; let i= index" (click)="userSelected(user)" class="sdrc-cursor-pointer">
