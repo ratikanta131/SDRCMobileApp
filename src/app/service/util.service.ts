@@ -11,7 +11,7 @@ import {
   Subscription
 } from 'rxjs';
 import {
-  ToastController
+  ToastController, LoadingController
 } from '@ionic/angular';
 var obj;
 @Injectable({
@@ -21,7 +21,8 @@ export class UtilService implements OnDestroy{
   toastMessage: EventEmitter < string > ;
   toastMessageSubcription: Subscription;
 
-  constructor(private toastCtrl: ToastController) {
+  constructor(private toastCtrl: ToastController,
+              public loadingController: LoadingController) {
     obj = this;
     this.toastMessage = new EventEmitter();
     this.toastMessageSubcription = this.toastMessage.subscribe(message => {

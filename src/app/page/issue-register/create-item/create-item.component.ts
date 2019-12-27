@@ -1,16 +1,15 @@
 import {
   Component,
   OnInit,
-  Input
+  Input,
+  OnDestroy
 } from '@angular/core';
 import {
   ModalController,
   ToastController
 } from '@ionic/angular';
 import {
-  FormGroup,
-  FormBuilder,
-  NgForm
+  FormGroup
 } from '@angular/forms';
 import {
   ItemAdd
@@ -21,15 +20,18 @@ import {
 import { Router } from '@angular/router';
 import { SyncService } from 'src/app/service/sync.service';
 import { catchError } from 'rxjs/operators';
-import { UtilService } from 'src/app/service/util.service';
-declare var $: any;
+import { HttpErrorResponse } from '@angular/common/http';
+import { LoadingService } from 'src/app/loading.service';
+import { throwError } from 'rxjs';
+import { AuthService } from '../../login/auth.service';
+var thisObject;
 
 @Component({
   selector: 'app-create-item',
   templateUrl: './create-item.component.html',
   styleUrls: ['./create-item.component.scss'],
 })
-export class CreateItemComponent implements OnInit {
+export class CreateItemComponent implements OnInit, OnDestroy {
 
   title: string;
 
@@ -46,8 +48,9 @@ export class CreateItemComponent implements OnInit {
 constructor(private modalController: ModalController,
             private createService: CreateService,
             private syncService: SyncService,
-            private utilService: UtilService,
             private toastCtrl: ToastController,
+            private loadingService: LoadingService,
+            private authService: AuthService,
             private router: Router) {}
 
   async close() {
@@ -62,20 +65,21 @@ ngOnInit() {
     this.fields.itemId = this.item.itemId;
     this.fields.accessories = this.item.accessories;
   } else {
-    this.title = 'Edit Item';
+    this.title = 'Create Item';
   }
 
 
   }
-  async openToast() {
+  async openToast(message: string) {
     const toast = await this.toastCtrl.create({
-      message: 'Item added successfully.',
+      message,
       duration: 2000
     });
     toast.present();
   }
 
-publishData(form: NgForm) {
+publishData() {
+    thisObject = this;
     const itemDetails = {
       id: this.fields.id,
       itemId: this.fields.itemId,
@@ -86,32 +90,77 @@ publishData(form: NgForm) {
       isLive: true
     };
     if (this.forEdit) {
+      this.loadingService.presentLoader('Updating Item, please wait...');
       this.createService.updateData(itemDetails)
       .pipe(
-        catchError(this.utilService.handleError)
+        catchError(this.handleError)
       ).subscribe(data => {
-        this.openToast();
-        console.log(data);
         this.createService.syncData = data;
-        form.resetForm();
         this.modalController.dismiss();
-        this.router.navigateByUrl('/home');
-        this.syncService.syncData();
+        this.updateDataInLocalDatabase();
       });
     } else {
+      this.loadingService.presentLoader('Creating Item, please wait...');
       this.createService.saveData(itemDetails)
       .pipe(
-        catchError(this.utilService.handleError)
+        catchError(this.handleError)
       ).subscribe(data => {
-        this.openToast();
-        console.log(data);
         this.createService.syncData = data;
-        form.resetForm();
         this.modalController.dismiss();
-        this.router.navigateByUrl('/home');
-        this.syncService.syncData();
+        this.updateDataInLocalDatabase();
       });
     }
+  }
+
+  handleError(error: HttpErrorResponse) {
+    thisObject.loadingService.dismissLoader();
+    if (error.status === 0) {
+        thisObject.openToast(`Please check your internet connection.`);
+    } else {
+      if (error.error instanceof ErrorEvent) {
+        // A client-side or network error occurred. Handle it accordingly.
+        thisObject.openToast('An error occurred:' + error.error.message);
+      } else {
+        switch (error.status) {
+          case 401:
+            thisObject.openToast(`Unauthorized`);
+            thisObject.close();
+            thisObject.authService.logout();
+            thisObject.router.navigateByUrl('/login');
+            break;
+          case 403:
+            thisObject.openToast(error.error.error_description);
+            break;
+          default:
+            thisObject.openToast(error.error.message);
+            break;
+        }
+      }
+      // return an observable with a user-facing error message
+      return throwError(
+        'Something bad happened; please try again later.');
+    }
+  }
+
+
+  updateDataInLocalDatabase() {
+    this.syncService.syncData()
+    .pipe(
+      catchError(this.handleError)
+    )
+    .subscribe(
+      async responseList => {
+        await this.syncService.saveItem(responseList[0]);
+        await this.syncService.saveUsers(responseList[1]);
+        this.loadingService.dismissLoader();
+        this.openToast('Item successfully added/ updated');
+        this.router.navigateByUrl('/home');
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    thisObject = null;
   }
 
 }

@@ -14,9 +14,9 @@
 
 
 <ion-content>
-    <ion-fab horizontal="end" vertical="bottom" slot="fixed" *ngIf="checkAuthority('ITEM_ALL_OPERATION')">
+    <ion-fab horizontal="end" vertical="bottom" slot="fixed" *ngIf="checkAuthority('ITEM_ALL_OPERATION')" (click)="showCreateItemModal()">
         <ion-fab-button color="primary">
-          <ion-icon name="add" (click)="showCreateItemModal()"></ion-icon>
+          <ion-icon name="add"></ion-icon>
         </ion-fab-button>
       </ion-fab>
 

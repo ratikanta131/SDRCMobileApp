@@ -10,7 +10,6 @@
 </ion-header>
 
 <ion-content padding>
-  <form #f="ngForm" (submit)="f.valid?publishData(f):''">
     <ion-grid>
       <ion-row>
         <ion-col size-md="6" offset-md="3">
@@ -32,11 +31,10 @@
       </ion-row>
       <ion-row>
         <ion-col size-sd="6" offset-sd="3">
-          <ion-button type="submit" color="primary" [disabled]="!f.valid" expand="block">
+          <ion-button color="primary" expand="block" (click)="publishData()">
             {{title}}
           </ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
-  </form>
 </ion-content>
